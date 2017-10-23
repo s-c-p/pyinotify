@@ -15,26 +15,20 @@ class Log(pyinotify.ProcessEvent):
         self._fileobj.write(str(event) + '\n')
         self._fileobj.flush()
 
-class TrackModifications(pyinotify.ProcessEvent):
-    def process_IN_MODIFY(self, event):
-        print 'IN_MODIFY'
-
-class Empty(pyinotify.ProcessEvent):
+class ModificationAlert(pyinotify.ProcessEvent):
     def my_init(self, msg):
         self._msg = msg
 
     def process_default(self, event):
-        print self._msg
+        print(self._msg)
 
+    def process_IN_MODIFY(self, event):
+        print('IN_MODIFY')
 
-# pyinotify.log.setLevel(10)
-fo = file('/var/log/pyinotify_log', 'w')
-try:
-    wm = pyinotify.WatchManager()
+with open('/var/log/pyinotify_log', 'wt') as fo:
     # It is important to pass named extra arguments like 'fileobj'.
-    handler = Empty(TrackModifications(Log(fileobj=fo)), msg='Outer chained method')
-    notifier = pyinotify.Notifier(wm, default_proc_fun=handler)
+    eventHandler = ModificationAlert(Log(fileobj=fo), msg='An operation happened on FS')
+    wm = pyinotify.WatchManager()
+    notifier = pyinotify.Notifier(wm, eventHandler)
     wm.add_watch('/tmp', pyinotify.ALL_EVENTS)
     notifier.loop()
-finally:
-    fo.close()
