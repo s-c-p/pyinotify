@@ -1,7 +1,5 @@
 # Example: daemonize pyinotify's notifier.
 #
-# Requires Python >= 2.5
-import functools
 import sys
 import pyinotify
 
@@ -14,17 +12,16 @@ def on_loop(notifier):
     """
     if counter > 40:
         # Loops 5 times then exits.
-        sys.stdout.write("Exit\n")
+        print("Exit\n")
         notifier.stop()
         sys.exit(0)
     else:
-        sys.stdout.write("-------------------Loop %d\n" % counter)
+        print("-------------------Loop %d\n" % counter)
         globals()["counter"] += 1
 
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm)
 wm.add_watch('/home/ubuntu-gnome', pyinotify.ALL_EVENTS)
-# on_loop_func = functools.partial(on_loop, counter=Counter())
 
 # Notifier instance spawns a new process when daemonize is set to True. This
 # child process' PID is written to /tmp/pyinotify.pid (it also automatically
@@ -41,5 +38,5 @@ wm.add_watch('/home/ubuntu-gnome', pyinotify.ALL_EVENTS)
 try:
     notifier.loop(daemonize=True, callback=on_loop,
                   pid_file='/tmp/pyinotify.pid', stdout='/tmp/pyinotify.log')
-except pyinotify.NotifierError, err:
-    print >> sys.stderr, err
+except pyinotify.NotifierError as err:
+    print(err)
