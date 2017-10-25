@@ -1,4 +1,10 @@
 # Example: daemonize pyinotify's notifier.
+# rm /tmp/pyinotify.*
+# python3 daemon.py
+# cat /tmp/pyinotify.pid
+# cat /tmp/pyinotify.log
+# cat /tmp[TAB]
+# cat /tmp/pyinotify.log
 #
 import sys
 import pyinotify
@@ -11,7 +17,7 @@ def on_loop(notifier):
     ensures the child process eventually exits (after 5 iterations).
     """
     if counter > 40:
-        # Loops 5 times then exits.
+        # Loop 40 times before daemon is killed
         print("Exit\n")
         notifier.stop()
         sys.exit(0)
