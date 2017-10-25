@@ -1,27 +1,30 @@
-import sys
+# Example: daemonize pyinotify's notifier.
+#
+# Requires Python >= 2.5
 import functools
+import sys
 import pyinotify
 
 counter = int()
 
-def on_loop(notifier, counter):
+def on_loop(notifier):
     """
-    Dummy function, called after each event loop
-    this method only ensures the child process exits
+    Dummy function called after each event loop, this method only
+    ensures the child process eventually exits (after 5 iterations).
     """
-    if counter.count > 4:
+    if counter > 40:
         # Loops 5 times then exits.
-        print("Exit\n")
+        sys.stdout.write("Exit\n")
         notifier.stop()
         sys.exit(0)
     else:
-        sys.stdout.write("Loop %d\n" % counter.count)
+        sys.stdout.write("-------------------Loop %d\n" % counter)
         globals()["counter"] += 1
 
 wm = pyinotify.WatchManager()
 notifier = pyinotify.Notifier(wm)
-wm.add_watch('/tmp', pyinotify.ALL_EVENTS)
-on_loop_func = functools.partial(on_loop, counter=counter)
+wm.add_watch('/home/ubuntu-gnome', pyinotify.ALL_EVENTS)
+# on_loop_func = functools.partial(on_loop, counter=Counter())
 
 # Notifier instance spawns a new process when daemonize is set to True. This
 # child process' PID is written to /tmp/pyinotify.pid (it also automatically
@@ -36,7 +39,7 @@ on_loop_func = functools.partial(on_loop, counter=counter)
 # /var/log (this file may contain sensitive data). Finally, callback is the
 # above function and will be called after each event loop.
 try:
-    notifier.loop(daemonize=True, callback=on_loop_func,
+    notifier.loop(daemonize=True, callback=on_loop,
                   pid_file='/tmp/pyinotify.pid', stdout='/tmp/pyinotify.log')
 except pyinotify.NotifierError, err:
     print >> sys.stderr, err
