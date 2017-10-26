@@ -23,6 +23,10 @@ class Log(pyinotify.ProcessEvent):
         self._fileobj.flush()
 
 class ModificationAlert(pyinotify.ProcessEvent):
+    """ prints a msg for all events on FileSystem but goes beyond that and
+    prints a detailed prompt whenever an IN_MODIFY (i.e. file modified)
+    operation takes place
+    """
     def my_init(self, msg):
         self._msg = msg
 
@@ -37,6 +41,7 @@ with open('/var/log/pyinotify_log', 'wt') as fo:
     # It is important to pass named extra arguments like 'fileobj'.
     eventHandler = ModificationAlert(Log(fileobj=fo), msg='An operation happened on FS')
     wm = pyinotify.WatchManager()
-    notifier = pyinotify.Notifier(wm, eventHandler)
+    notifier = pyinotify.Notifier(wm, default_proc_fun=eventHandler)
     wm.add_watch('/tmp', pyinotify.ALL_EVENTS)
     notifier.loop()
+

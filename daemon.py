@@ -1,8 +1,11 @@
+# TODO: put ``daemonize=True`` or other things in notifier's
+# instanciation
+# 
 # Example: daemonize pyinotify's notifier.
 # rm /tmp/pyinotify.*
 # python3 daemon.py
 # cat /tmp/pyinotify.pid
-# cat /tmp/pyinotify.log
+# cat /tmp/pyinotify.log # maybe kill -9 PID
 # cat /tmp[TAB]
 # cat /tmp/pyinotify.log
 #
